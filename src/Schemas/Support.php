@@ -130,7 +130,7 @@ class Support extends PackageManagement implements ContractsSupport
     public function prepareDeleteSupport(? array $attributes = null): bool{
         $attributes ??= \request()->all();
         if (!$attributes['id']) throw new \Exception('No id provided', 422);
-        $result = $this->support()->find($attributes['id'])->delete();
+        $result = $this->support()->findOrFail($attributes['id'])->delete();
         $this->flushTagsFrom('index');
         return $result;
     }
