@@ -15,6 +15,7 @@ class DocumentType extends BaseModuleSupport implements ContractsDocumentType
 {
     protected string $__entity = 'DocumentType';
     public static $document_type_model;
+    protected mixed $__order_by_created_at = false; //asc, desc, false
 
     protected array $__cache = [
         'index' => [
