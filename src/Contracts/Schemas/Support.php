@@ -10,20 +10,22 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Hanafalah\LaravelSupport\Contracts\Supports\DataManagement;
 use Hanafalah\ModuleSupport\Contracts\Data\SupportData;
 
+/**
+ * @see \Hanafalah\ModuleSupport\Schemas\Support
+ * @method self conditionals(mixed $conditionals)
+ * @method bool deleteSupport()
+ * @method bool prepareDeleteSupport(? array $attributes = null)
+ * @method mixed getSupport()
+ * @method ?Model prepareShowSupport(?Model $model = null, ?array $attributes = null)
+ * @method array showSupport(?Model $model = null)
+ * @method Collection prepareViewSupportList()
+ * @method array viewSupportList()
+ * @method LengthAwarePaginator prepareViewSupportPaginate(PaginateData $paginate_dto)
+ * @method array viewSupportPaginate(?PaginateData $paginate_dto = null)
+ * @method array storeSupport(?SupportData $support_dto = null)
+ * @method Builder support(mixed $conditionals = null)
+ */
 interface Support extends DataManagement
 {
-    public function getSupport(): mixed;
-    public function prepareShowSupport(?Model $model = null, ?array $attributes = null): ?Model;
-    public function showSupport(?Model $model = null): array;
     public function prepareStoreSupport(SupportData $support_dto): Model;
-    public function storeSupport(?SupportData $support_dto = null): array;
-    public function prepareViewSupportList(): Collection;
-    public function viewSupportList(): array;
-    public function prepareViewSupportPaginate(PaginateData $paginate_dto): LengthAwarePaginator;
-    public function viewSupportPaginate(?PaginateData $paginate_dto = null): array;
-    public function prepareDeleteSupport(? array $attributes = null): bool;
-    public function deleteSupport(): bool;
-    public function support(mixed $conditionals = null): Builder;
-    
-    
 }
