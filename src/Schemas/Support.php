@@ -21,7 +21,7 @@ class Support extends PackageManagement implements ContractsSupport
         'index' => [
             'name'     => 'support',
             'tags'     => ['support', 'support-index'],
-            'forever'  => true
+            'duration' => 24 * 60
         ]
     ];
 
@@ -34,13 +34,14 @@ class Support extends PackageManagement implements ContractsSupport
     }
 
     public function prepareStoreSupport(SupportData $support_dto): Model{
-        $support = $this->support()->updateOrCreate([
+        $support = $this->SupportModel()->updateOrCreate([
                         'id'             => $support_dto->id ?? null,
-                        'reference_type' => $support_dto->reference_type,
-                        'reference_id'   => $support_dto->reference_id
                     ], [
+                        'reference_type' => $support_dto->reference_type,
+                        'reference_id'   => $support_dto->reference_id,
                         'name' => $support_dto->name
                     ]);
+
         $this->fillingProps($support,$support_dto->props);
 
         if (isset($support_dto->paths) && count($support_dto->paths) > 0) {
