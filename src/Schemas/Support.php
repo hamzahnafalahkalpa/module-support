@@ -43,7 +43,6 @@ class Support extends PackageManagement implements ContractsSupport
                     ]);
 
         $this->fillingProps($support,$support_dto->props);
-
         if (isset($support_dto->paths) && count($support_dto->paths) > 0) {
             static::$support_model = $support;
             $support->paths = $this->pushFiles($support_dto->paths);
