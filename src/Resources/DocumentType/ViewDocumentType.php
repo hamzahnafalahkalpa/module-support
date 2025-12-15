@@ -14,7 +14,9 @@ class ViewDocumentType extends ViewUnicode
    */
   public function toArray(\Illuminate\Http\Request $request): array
   {
-    $arr = [];
+    $arr = [
+      'dynamic_forms' => $this->dynamic_forms,
+    ];
     $arr = $this->mergeArray(parent::toArray($request),$arr);
     return $arr;
   }
