@@ -42,6 +42,31 @@ class Support extends PackageManagement implements ContractsSupport
                         'name' => $support_dto->name
                     ]);
 
+        $attributes['files'] = $this->mustArray($attributes['files']);
+        $attributes['paths'] ??= [];
+        $driver = config('filesystems.default','public');
+        foreach ($attributes['files'] as $file) {
+            if ($file instanceof \Illuminate\Http\UploadedFile) {
+                $filename = $file->getClientOriginalName();
+                $data     = [$target_path, $file, $filename];
+                $attributes['paths'][] = Storage::disk($driver)->putFileAs(...$data);
+            } else {
+                if (isset($attributes['id'])) {
+                    $file = Str::replace(medical_support_url(''),'',$file);
+                    $attributes['paths'][] = $file;
+                }
+            }
+        }
+        $paths = $this->assessment_model->paths ?? [];
+        if (count($paths) > 0) {
+            $diff  = array_diff($paths, $attributes['files']);
+            if (isset($diff) && count($diff) > 0) {
+                foreach ($diff as $path) if (Storage::disk($driver)->exists($path)) Storage::disk($driver)->delete($path);
+            }
+        }
+        $attributes['files'] = [];
+        return $attributes;
+
         $this->fillingProps($support,$support_dto->props);
         if (isset($support_dto->paths) && count($support_dto->paths) > 0) {
             $this->support_model = $support;
