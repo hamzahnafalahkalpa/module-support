@@ -14,19 +14,27 @@ class ViewSupport extends ApiResource
    */
   public function toArray(\Illuminate\Http\Request $request): array
   {
+    $paths = $this->paths;
+    $paths ??= [];
+    foreach ($paths as &$path) {
+      $path = support_asset($path);
+    }
     $arr = [
       'id'          => $this->id,
       'name'        => $this->name,
       'paths'       => $this->paths,
       'author'      => $this->prop_author,
+      'paths'       => $paths,
       'created_at'  => $this->created_at,
       'updated_at'  => $this->updated_at
     ];
-    $paths_urls = [];
-    if (isset($this->paths)){
-      foreach ($this->paths as $path) $paths_urls[] = $this->getFullUrl($path);
-    }
-    $arr['url_paths'] = $paths_urls;
+    
+    // $arr = $this->mergeArray(parent::toArray($request),$arr);
+    // $paths_urls = [];
+    // if (isset($this->paths)){
+    //   foreach ($this->paths as $path) $paths_urls[] = $this->getFullUrl($path);
+    // }
+    // $arr['url_paths'] = $paths_urls;
     return $arr;
   }
 }
