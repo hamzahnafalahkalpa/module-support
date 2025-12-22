@@ -10,7 +10,7 @@ use Hanafalah\ModuleSupport\Contracts\Data\SupportData;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class Support extends PackageManagement implements ContractsSupport
+class SupportBackup extends PackageManagement implements ContractsSupport
 {
     use HasFileUpload;
 
@@ -46,37 +46,39 @@ class Support extends PackageManagement implements ContractsSupport
         if (isset($support_dto->props['files']) || isset($support_dto->props['paths']) ){
             $support_dto->props['paths'] ??= [];
             $support_dto->props['target_path'] ?? '/support';
-            $driver = $this->driver();
+            $driver = config('filesystems.default','public');
             if (isset($support_dto->props['files'])){
                 $support_dto->props['files'] = $this->mustArray($support_dto->props['files']);
                 $paths = $this->pushFiles($support_dto->props['files']);
                 $support_dto->props['paths'] = $paths;
                 unset($support_dto->props['files']);
+                // $driver = config('filesystems.default','public');
+                // $target_path = $support_dto->props['target_path'] ?? '/support';
+                // foreach ($support_dto->props['files'] as $file) {
+                //     if ($file instanceof \Illuminate\Http\UploadedFile) {
+                //         $filename = $file->getClientOriginalName();
+                //         $data     = [$target_path, $file, $filename];
+                //         $support_dto->props['paths'][] = Storage::disk($driver)->putFileAs(...$data);
+                //     } else {
+                //         if (isset($support_dto->id)) {
+                //             $file = Str::replace($target_path,'',$file);
+                //             $support_dto->props['paths'][] = $file;
+                //         }
+                //     }
+                // }
+            }
+            $paths = $support->paths ?? [];
+            if (count($paths) > 0) {
+                $diff  = array_diff($paths, $support_dto->props['paths']);
+                if (isset($diff) && count($diff) > 0) {
+                    foreach ($diff as $path) if (Storage::disk($driver)->exists($path)) Storage::disk($driver)->delete($path);
+                }
             }
             $support_dto->props['files'] = [];
-        }
-        $paths = $support->paths ?? [];
-        if (count($paths) > 0) {
-            foreach ($support_dto->props['paths'] as &$path) {
-                $path = $this->normalizeStoragePath($path);
-            }
-            $diff  = array_diff($paths, $support_dto->props['paths']);
-            if (isset($diff) && count($diff) > 0) {
-                foreach ($diff as $path) if (Storage::disk($driver)->exists($path)) Storage::disk($driver)->delete($path);
-            }
         }
         $this->fillingProps($support, $support_dto->props);
         $support->save();
         $this->support_model = $support;
         return $support;
-    }
-
-    protected function normalizeStoragePath(string $path): string{
-        if (!filter_var($path, FILTER_VALIDATE_URL)) {
-            return ltrim($path, '/');
-        }
-        $parsed = parse_url($path);
-        $cleanPath = $parsed['path'] ?? '';
-        return ltrim($cleanPath, '/');
     }
 }

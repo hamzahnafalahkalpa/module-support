@@ -6,6 +6,7 @@ use Hanafalah\LaravelSupport\Supports\Data;
 use Hanafalah\ModuleSupport\Contracts\Data\SupportData as DataSupportData;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
+use Illuminate\Support\Str;
 
 class SupportData extends Data implements DataSupportData
 {
@@ -19,27 +20,47 @@ class SupportData extends Data implements DataSupportData
 
     #[MapInputName('reference_type')]
     #[MapName('reference_type')]
-    public string $reference_type;
+    public ?string $reference_type = null;
 
     #[MapInputName('reference_id')]
     #[MapName('reference_id')]
-    public mixed $reference_id;
+    public mixed $reference_id = null;
 
     #[MapInputName('author_type')]
     #[MapName('author_type')]
-    public string $author_type;
+    public ?string $author_type = null;
 
     #[MapInputName('author_id')]
     #[MapName('author_id')]
-    public mixed $author_id;
+    public mixed $author_id = null;
 
     #[MapInputName('paths')]
     #[MapName('paths')]
     public ?array $paths = [];
 
+    #[MapInputName('is_chunk')]
+    #[MapName('is_chunk')]
+    public ?bool $is_chunk = false;
+
     #[MapInputName('props')]
     #[MapName('props')]
     public mixed $props = [];
+
+    public static function before(?array &$attributes){
+        if (isset($attributes['is_chunk']) && $attributes['is_chunk']){
+            $attributes['progress'] ??= 0;
+            if ($attributes['progress'] == 0){
+                $total_size = $attributes['total_size'] ??= 0;
+                if ($total_size == 0) throw new \Exception('Total size is required for chunked upload');
+                if (!isset($attributes['mimetype'])) throw new \Exception('Mimetype is required for chunked upload');
+                $attributes['chunk_size'] ??= 1048576;
+                $attributes['total_chunks'] = ceil($total_size / $attributes['chunk_size']);
+                $attributes['status'] = 'PENDING';
+                $attributes['total_size'] = intval($total_size);
+                $attributes['upload_id'] ??= Str::orderedUuid()->toString();
+            }
+        }
+    }
 
     public static function after(SupportData $data): SupportData{
         $data->props['prop_author'] = [
