@@ -27,8 +27,8 @@ class Support extends PackageManagement implements ContractsSupport
         ]
     ];
 
-    protected function pushFiles(array $paths): array{
-        return $this->setupFiles($paths);
+    protected function pushFiles(array $files, string $path): array{
+        return $this->setupFiles($files, $path);
     }
 
     public function getCurrentFiles(): array{
@@ -49,7 +49,7 @@ class Support extends PackageManagement implements ContractsSupport
             $driver = $this->driver();
             if (isset($support_dto->props['files'])){
                 $support_dto->props['files'] = $this->mustArray($support_dto->props['files']);
-                $paths = $this->pushFiles($support_dto->props['files']);
+                $paths = $this->pushFiles($support_dto->props['files'], $support_dto->props['target_path']);
                 $support_dto->props['paths'] = $paths;
                 unset($support_dto->props['files']);
             }
